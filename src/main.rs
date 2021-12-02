@@ -1,3 +1,7 @@
+mod day2;
+
+use day2::solve_day_2p1;
+
 use std::fs::File;
 use std::io::{BufRead, BufReader, Result};
 
@@ -41,5 +45,6 @@ fn solve_day_1p2(filename: &str) -> Result<u32> {
 fn main() -> Result<()> {
     println!("day 1.1 {}", solve_day_1p1("resources/day1")?);
     println!("day 1.2 {}", solve_day_1p2("resources/day1")?);
+    println!("day 2.1 {}", solve_day_2p1("resources/day2")?);
     Ok(())
 }
