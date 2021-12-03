@@ -7,7 +7,7 @@ struct Position {
     aim: u32,
 }
 
-pub fn solve_day_2p1(filename: &str) -> Result<u32> {
+pub fn solve_day_p1(filename: &str) -> Result<u32> {
     let file = File::open(filename)?;
     let buffer = BufReader::new(file);
     let lines = buffer
@@ -45,7 +45,7 @@ pub fn solve_day_2p1(filename: &str) -> Result<u32> {
     Ok(position.depth * position.horizontal)
 }
 
-pub fn solve_day_2p2(filename: &str) -> Result<u32> {
+pub fn solve_day_p2(filename: &str) -> Result<u32> {
     let file = File::open(filename)?;
     let buffer = BufReader::new(file);
     let lines = buffer
