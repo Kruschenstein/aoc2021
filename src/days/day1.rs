@@ -1,12 +1,10 @@
-use std::fs::File;
-use std::io::{BufRead, BufReader, Result};
+use super::util::read_file_lines;
 
-pub fn solve_day_p1(filename: &str) -> Result<u32> {
-    let file = File::open(filename)?;
-    let buffer = BufReader::new(file);
-    let lines = buffer
-        .lines()
-        .map(|line| line.unwrap())
+use std::io::Result;
+
+pub fn solve_p1(filename: &str) -> Result<u32> {
+    let lines = read_file_lines(filename)?
+        .iter()
         .map(|line| line.parse::<u32>().unwrap())
         .collect::<Vec<u32>>();
 
@@ -17,12 +15,9 @@ pub fn solve_day_p1(filename: &str) -> Result<u32> {
         .sum())
 }
 
-pub fn solve_day_p2(filename: &str) -> Result<u32> {
-    let file = File::open(filename)?;
-    let buffer = BufReader::new(file);
-    let lines = buffer
-        .lines()
-        .map(|line| line.unwrap())
+pub fn solve_p2(filename: &str) -> Result<u32> {
+    let lines = read_file_lines(filename)?
+        .iter()
         .map(|line| line.parse::<u32>().unwrap())
         .collect::<Vec<u32>>();
 

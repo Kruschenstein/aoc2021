@@ -1,11 +1,8 @@
-use std::fs::File;
-use std::io::{BufRead, BufReader, Result};
+use super::util::{bytes_to_num, read_file_lines};
+use std::io::Result;
 
 pub fn solve_p1(filename: &str) -> Result<u32> {
-    let file = File::open(filename)?;
-    let lines = BufReader::new(file)
-        .lines()
-        .collect::<Result<Vec<String>>>()?;
+    let lines = read_file_lines(filename)?;
 
     let count_1 = count_number_of_1_for_each_position(&lines);
     let (gamma, epsilon) = to_gamma_and_epsilon(lines.len(), &count_1);
@@ -38,12 +35,5 @@ fn to_gamma_and_epsilon(lines_len: usize, count: &[u32]) -> (u32, u32) {
         }
     }
 
-    (byte_to_num(&gamma), byte_to_num(&epsilon))
-}
-
-fn byte_to_num(buf: &[u8]) -> u32 {
-    buf.iter()
-        .rev()
-        .enumerate()
-        .fold(0, |acc, (i, &val)| acc + 2_u32.pow(i as u32) * val as u32)
+    (bytes_to_num(&gamma), bytes_to_num(&epsilon))
 }

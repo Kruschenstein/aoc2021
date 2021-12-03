@@ -1,5 +1,5 @@
-use std::fs::File;
-use std::io::{BufRead, BufReader, Result};
+use super::util::read_file_lines;
+use std::io::Result;
 
 struct Position {
     depth: u32,
@@ -7,13 +7,8 @@ struct Position {
     aim: u32,
 }
 
-pub fn solve_day_p1(filename: &str) -> Result<u32> {
-    let file = File::open(filename)?;
-    let buffer = BufReader::new(file);
-    let lines = buffer
-        .lines()
-        .map(|line| line.unwrap())
-        .collect::<Vec<String>>();
+pub fn solve_p1(filename: &str) -> Result<u32> {
+    let lines = read_file_lines(filename)?;
 
     let position = lines.iter().fold(
         Position {
@@ -45,13 +40,8 @@ pub fn solve_day_p1(filename: &str) -> Result<u32> {
     Ok(position.depth * position.horizontal)
 }
 
-pub fn solve_day_p2(filename: &str) -> Result<u32> {
-    let file = File::open(filename)?;
-    let buffer = BufReader::new(file);
-    let lines = buffer
-        .lines()
-        .map(|line| line.unwrap())
-        .collect::<Vec<String>>();
+pub fn solve_p2(filename: &str) -> Result<u32> {
+    let lines = read_file_lines(filename)?;
 
     let position = lines.iter().fold(
         Position {
