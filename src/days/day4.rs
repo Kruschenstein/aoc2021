@@ -32,8 +32,7 @@ pub fn solve_p1(filename: &str) -> Result<u32> {
         for mut grid in grids.iter_mut() {
             mark_grid_elem(num, &mut grid);
             if grid_has_line(&grid) {
-                let all_unmarked = get_all_unmarked_number(&grid);
-                return Ok(all_unmarked.iter().sum::<u32>() * num);
+                return Ok(compute_solution(num, &grid));
             }
         }
     }
@@ -74,6 +73,11 @@ fn mark_grid_elem(num: u32, grid: &mut Grid) {
     }
 }
 
+fn compute_solution(num: u32, grid: &Grid) -> u32 {
+    let all_unmarked = get_all_unmarked_number(&grid);
+    all_unmarked.iter().sum::<u32>() * num
+}
+
 fn grid_has_line(grid: &Grid) -> bool {
     for (i, line) in grid.iter().enumerate() {
         if is_line_entirely_marked(&line) || is_column_entirely_marked(i, &grid) {
@@ -99,4 +103,31 @@ fn get_all_unmarked_number(grid: &Grid) -> Vec<u32> {
         .filter(|elem| !elem.marked)
         .map(|elem| elem.elem)
         .collect()
+}
+
+pub fn solve_p2(filename: &str) -> Result<u32> {
+    let lines = read_file_lines(filename)?;
+    let nums = read_numbers_line(&lines);
+
+    let mut grids = read_grid(&lines);
+
+    for num in nums {
+        let mut completed_grid_positions = vec![];
+        for (i, mut grid) in grids.iter_mut().enumerate() {
+            mark_grid_elem(num, &mut grid);
+            if grid_has_line(&grid) {
+                completed_grid_positions.push(i);
+            }
+        }
+
+        for (i, completed_position) in completed_grid_positions.iter().enumerate() {
+            let position = completed_position - i;
+            if grids.len() == 1 {
+                return Ok(compute_solution(num, &grids[position]));
+            } else {
+                grids.remove(position);
+            }
+        }
+    }
+    Err(Error::new(ErrorKind::Other, "Nothing found"))
 }
