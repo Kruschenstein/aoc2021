@@ -12,5 +12,6 @@ fn main() -> Result<()> {
     println!("day 3.2 {}", day3::solve_p2("resources/day3")?);
     println!("day 4.1 {}", day4::solve_p1("resources/day4")?);
     println!("day 4.2 {}", day4::solve_p2("resources/day4")?);
+    println!("day 5.1 {}", day5::solve_p1("resources/day5")?);
     Ok(())
 }
