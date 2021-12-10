@@ -1,4 +1,4 @@
-use super::util::read_file_lines;
+use super::util::{median, read_file_lines};
 use std::io::Result;
 
 pub fn solve_p1(filename: &str) -> Result<u32> {
@@ -11,11 +11,7 @@ pub fn solve_p1(filename: &str) -> Result<u32> {
             if is_open(c) {
                 stack.push(c);
             } else if let Some(pair) = stack.pop() {
-                if pair == '(' && c != ')'
-                    || pair == '[' && c != ']'
-                    || pair == '{' && c != '}'
-                    || pair == '<' && c != '>'
-                {
+                if does_not_close(pair, c) {
                     res += get_score(c);
                     break;
                 }
@@ -35,6 +31,13 @@ fn is_open(c: char) -> bool {
     }
 }
 
+fn does_not_close(open: char, close: char) -> bool {
+    open == '(' && close != ')'
+        || open == '[' && close != ']'
+        || open == '{' && close != '}'
+        || open == '<' && close != '>'
+}
+
 fn get_score(c: char) -> u32 {
     match c {
         ')' => 3,
@@ -45,4 +48,48 @@ fn get_score(c: char) -> u32 {
             panic!("unexpected {}", c);
         }
     }
+}
+
+pub fn solve_p2(filename: &str) -> Result<u64> {
+    let scores = read_file_lines(filename)?
+        .iter()
+        .filter_map(get_line_score)
+        .collect::<Vec<_>>();
+    Ok(median(&scores))
+}
+
+fn get_line_score(line: &String) -> Option<u64> {
+    match get_valid_symbol_stack(line) {
+        Some(mut stack) => Some(get_remaining_symbol_score(&mut stack)),
+        _ => None,
+    }
+}
+
+fn get_valid_symbol_stack(line: &String) -> Option<Vec<char>> {
+    let mut stack = vec![];
+    for c in line.chars() {
+        if is_open(c) {
+            stack.push(c);
+        } else if let Some(pair) = stack.pop() {
+            if does_not_close(pair, c) {
+                return None;
+            }
+        }
+    }
+    Some(stack)
+}
+
+fn get_remaining_symbol_score(stack: &mut Vec<char>) -> u64 {
+    let mut res = 0;
+    while let Some(symbol) = stack.pop() {
+        res *= 5;
+        match symbol {
+            '(' => res += 1,
+            '[' => res += 2,
+            '{' => res += 3,
+            '<' => res += 4,
+            _ => panic!("unexpected {}", symbol),
+        }
+    }
+    res
 }
