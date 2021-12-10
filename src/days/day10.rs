@@ -25,10 +25,7 @@ pub fn solve_p1(filename: &str) -> Result<u32> {
 }
 
 fn is_open(c: char) -> bool {
-    match c {
-        '(' | '[' | '{' | '<' => true,
-        _ => false,
-    }
+    matches!(c, '(' | '[' | '{' | '<')
 }
 
 fn does_not_close(open: char, close: char) -> bool {
@@ -53,19 +50,16 @@ fn get_score(c: char) -> u32 {
 pub fn solve_p2(filename: &str) -> Result<u64> {
     let scores = read_file_lines(filename)?
         .iter()
-        .filter_map(get_line_score)
+        .filter_map(|line| get_line_score(line))
         .collect::<Vec<_>>();
     Ok(median(&scores))
 }
 
-fn get_line_score(line: &String) -> Option<u64> {
-    match get_valid_symbol_stack(line) {
-        Some(mut stack) => Some(get_remaining_symbol_score(&mut stack)),
-        _ => None,
-    }
+fn get_line_score(line: &str) -> Option<u64> {
+    get_valid_symbol_stack(line).map(|mut stack| get_remaining_symbol_score(&mut stack))
 }
 
-fn get_valid_symbol_stack(line: &String) -> Option<Vec<char>> {
+fn get_valid_symbol_stack(line: &str) -> Option<Vec<char>> {
     let mut stack = vec![];
     for c in line.chars() {
         if is_open(c) {

@@ -8,7 +8,7 @@ pub fn solve_p1(filename: &str) -> Result<u32> {
     Ok(lines
         .iter()
         .map(|line| line.split(" | ").collect::<Vec<_>>()[1])
-        .flat_map(|digits| digits.split(" ").map(|d| d.len()))
+        .flat_map(|digits| digits.split(' ').map(|d| d.len()))
         .filter(|d| *d >= 2 && *d <= 4 || *d == 7)
         .count() as u32)
 }
@@ -65,32 +65,31 @@ fn decode(digits: Vec<&str>, keys: &HashMap<char, char>, table: &HashMap<&str, u
 
 fn sort_str(string: String) -> String {
     let mut vec_str = string.chars().collect::<Vec<_>>();
-    vec_str.sort_by(|a, b| a.cmp(b));
+    vec_str.sort_unstable();
     String::from_iter(&vec_str)
 }
 
 fn find_keys(codes: Vec<HashSet<char>>, eight: &HashSet<char>) -> HashMap<char, char> {
     let mut keys = HashMap::with_capacity(7);
-    let one = codes.iter().filter(|d| d.len() == 2).next().unwrap();
-    let four = codes.iter().filter(|d| d.len() == 4).next().unwrap();
-    let seven = codes.iter().filter(|d| d.len() == 3).next().unwrap();
-    keys.insert(seven.difference(&one).next().unwrap().clone(), 'a');
-    let first_found = four.union(seven).map(|e| e.clone()).collect::<HashSet<_>>();
+    let one = codes.iter().find(|d| d.len() == 2).unwrap();
+    let four = codes.iter().find(|d| d.len() == 4).unwrap();
+    let seven = codes.iter().find(|d| d.len() == 3).unwrap();
+    let a_key = *seven.difference(one).next().unwrap();
+    keys.insert(a_key, 'a');
+    let first_found = four.union(seven).copied().collect::<HashSet<_>>();
     let nine = codes
         .iter()
-        .filter(|d| d.len() == 6 && first_found.is_subset(d))
-        .next()
+        .find(|d| d.len() == 6 && first_found.is_subset(d))
         .unwrap();
     let g_key = *nine.difference(&first_found).next().unwrap();
     keys.insert(g_key, 'g');
-    let e_key = *eight.difference(&nine).next().unwrap();
+    let e_key = *eight.difference(nine).next().unwrap();
     keys.insert(e_key, 'e');
     let two = codes
         .iter()
-        .filter(|d| d.len() == 5 && found_keys(&keys).is_subset(*d))
-        .next()
+        .find(|d| d.len() == 5 && found_keys(&keys).is_subset(*d))
         .unwrap();
-    let c_key = *two.intersection(&one).next().unwrap();
+    let c_key = *two.intersection(one).next().unwrap();
     keys.insert(c_key, 'c');
     let f_key = *one.difference(&HashSet::from([c_key])).next().unwrap();
     keys.insert(f_key, 'f');
@@ -103,5 +102,5 @@ fn find_keys(codes: Vec<HashSet<char>>, eight: &HashSet<char>) -> HashMap<char, 
 }
 
 fn found_keys(keys: &HashMap<char, char>) -> HashSet<char> {
-    HashSet::from_iter(keys.keys().map(|e| e.clone()))
+    HashSet::from_iter(keys.keys().copied())
 }

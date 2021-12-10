@@ -36,7 +36,7 @@ impl Add<(i32, i32)> for Point {
 pub fn solve_p1(filename: &str) -> Result<u32> {
     let lines = read_file_lines(filename)?
         .iter()
-        .map(to_segment)
+        .map(|line| to_segment(line))
         .filter(|(p1, p2)| p1.x == p2.x || p1.y == p2.y)
         .collect::<Vec<_>>();
 
@@ -52,7 +52,7 @@ pub fn solve_p1(filename: &str) -> Result<u32> {
 pub fn solve_p2(filename: &str) -> Result<u32> {
     let lines = read_file_lines(filename)?
         .iter()
-        .map(to_segment)
+        .map(|line| to_segment(line))
         .collect::<Vec<_>>();
 
     let mut grid = new_grid();
@@ -72,7 +72,7 @@ fn new_grid() -> Grid {
     [[0; GRID_SIZE]; GRID_SIZE]
 }
 
-fn to_segment(line: &String) -> Segment {
+fn to_segment(line: &str) -> Segment {
     let points = line.split(" -> ").collect::<Vec<&str>>();
     let first = Point::from(points[0]);
     let second = Point::from(points[1]);

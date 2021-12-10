@@ -49,8 +49,8 @@ pub fn solve_p2(filename: &str) -> Result<u32> {
         let count1_co2 = get_number_of_1_at_position(&co2, i);
         let oxygen_len = oxygen.len() as u32;
         let co2_len = co2.len() as u32;
-        let keep1_oxygen = count1_oxygen >= (oxygen_len - count1_oxygen);
-        let keep1_co2 = count1_co2 < (co2_len - count1_co2);
+        let keep1_oxygen = count1_oxygen * 2 >= oxygen_len;
+        let keep1_co2 = count1_co2 < co2_len / 2;
 
         if oxygen_len > 1 {
             oxygen = oxygen

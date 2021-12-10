@@ -31,8 +31,8 @@ pub fn solve_p1(filename: &str) -> Result<u32> {
     for num in nums {
         for mut grid in grids.iter_mut() {
             mark_grid_elem(num, &mut grid);
-            if grid_has_line(&grid) {
-                return Ok(compute_solution(num, &grid));
+            if grid_has_line(grid) {
+                return Ok(compute_solution(num, grid));
             }
         }
     }
@@ -73,31 +73,31 @@ fn mark_grid_elem(num: u32, grid: &mut Grid) {
     }
 }
 
-fn compute_solution(num: u32, grid: &Grid) -> u32 {
-    let all_unmarked = get_all_unmarked_number(&grid);
+fn compute_solution(num: u32, grid: &[Vec<Marked>]) -> u32 {
+    let all_unmarked = get_all_unmarked_number(grid);
     all_unmarked.iter().sum::<u32>() * num
 }
 
-fn grid_has_line(grid: &Grid) -> bool {
+fn grid_has_line(grid: &[Vec<Marked>]) -> bool {
     for (i, line) in grid.iter().enumerate() {
-        if is_line_entirely_marked(&line) || is_column_entirely_marked(i, &grid) {
+        if is_line_entirely_marked(line) || is_column_entirely_marked(i, grid) {
             return true;
         }
     }
-    return false;
+    false
 }
 
 fn is_line_entirely_marked(line: &[Marked]) -> bool {
     line.iter().all(|elem| elem.marked)
 }
 
-fn is_column_entirely_marked(column_index: usize, grid: &Grid) -> bool {
+fn is_column_entirely_marked(column_index: usize, grid: &[Vec<Marked>]) -> bool {
     grid.iter()
         .map(|line| &line[column_index])
         .all(|elem| elem.marked)
 }
 
-fn get_all_unmarked_number(grid: &Grid) -> Vec<u32> {
+fn get_all_unmarked_number(grid: &[Vec<Marked>]) -> Vec<u32> {
     grid.iter()
         .flat_map(|line| line.iter())
         .filter(|elem| !elem.marked)
@@ -115,7 +115,7 @@ pub fn solve_p2(filename: &str) -> Result<u32> {
         let mut completed_grid_positions = vec![];
         for (i, mut grid) in grids.iter_mut().enumerate() {
             mark_grid_elem(num, &mut grid);
-            if grid_has_line(&grid) {
+            if grid_has_line(grid) {
                 completed_grid_positions.push(i);
             }
         }

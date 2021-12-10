@@ -14,8 +14,8 @@ pub fn bytes_to_num(buf: &[u8]) -> u32 {
         .fold(0, |acc, (i, &val)| acc + 2_u32.pow(i as u32) * val as u32)
 }
 
-pub fn median<T: Ord + Copy>(collection: &Vec<T>) -> T {
-    let mut sorted = collection.clone();
+pub fn median<T: Ord + Copy>(collection: &[T]) -> T {
+    let mut sorted = collection.to_owned();
     sorted.sort();
     sorted[sorted.len() / 2]
 }

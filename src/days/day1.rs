@@ -21,10 +21,7 @@ pub fn solve_p2(filename: &str) -> Result<u32> {
         .map(|line| line.parse::<u32>().unwrap())
         .collect::<Vec<u32>>();
 
-    let windows: Vec<u32> = lines
-        .windows(3)
-        .map(|elem| elem.into_iter().sum())
-        .collect();
+    let windows: Vec<u32> = lines.windows(3).map(|elem| elem.iter().sum()).collect();
 
     Ok(windows
         .iter()

@@ -3,7 +3,7 @@ use std::collections::HashSet;
 use std::io::Result;
 
 type Point = (usize, usize);
-type Grid = Vec<Vec<u32>>;
+type Grid = [Vec<u32>];
 
 pub fn solve_p1(filename: &str) -> Result<u32> {
     let grid = read_file_lines(filename)?
@@ -26,7 +26,7 @@ pub fn solve_p1(filename: &str) -> Result<u32> {
                 get_at_coord_with_move(&grid, x, y, (1, 0)),
             ]
             .into_iter()
-            .filter_map(|x| x)
+            .flatten()
             .collect::<Vec<_>>();
             if neighbors.iter().all(|n| *n > actual) {
                 res += actual + 1;
@@ -46,8 +46,8 @@ fn get_coord(x: usize, y: usize, (x1, y1): (i8, i8)) -> Option<Point> {
     }
 }
 
-fn get_at<T: Copy>(grid: &Vec<Vec<T>>, (x, y): &Point) -> Option<T> {
-    grid.get(*y).map(|g| g.get(*x)).flatten().map(|e| *e)
+fn get_at<T: Copy>(grid: &[Vec<T>], (x, y): &Point) -> Option<T> {
+    grid.get(*y).map(|g| g.get(*x)).flatten().copied()
 }
 
 fn get_at_coord_with_move(grid: &Grid, x: usize, y: usize, (x1, y1): (i8, i8)) -> Option<u32> {
@@ -71,12 +71,7 @@ pub fn solve_p2(filename: &str) -> Result<u32> {
         .collect::<HashSet<_>>();
 
     let mut groups = vec![];
-    loop {
-        let point = match points.iter().next() {
-            Some(p) => *p,
-            _ => break,
-        };
-
+    while let Some(&point) = points.iter().next() {
         let mut group = HashSet::from([point]);
         points.remove(&point);
 
@@ -107,9 +102,9 @@ fn get_new_points((x, y): Point, group: &HashSet<Point>, grid: &Grid) -> Vec<Poi
     ];
     neighbors
         .into_iter()
-        .filter_map(|x| x)
+        .flatten()
         .filter(|p| !group.contains(p))
-        .filter(|p| match get_at(&grid, p) {
+        .filter(|p| match get_at(grid, p) {
             Some(p) => p != 9,
             _ => false,
         })
