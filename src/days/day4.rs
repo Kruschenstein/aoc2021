@@ -29,8 +29,8 @@ pub fn solve_p1(filename: &str) -> Result<u32> {
     let mut grids = read_grid(&lines);
 
     for num in nums {
-        for mut grid in grids.iter_mut() {
-            mark_grid_elem(num, &mut grid);
+        for grid in grids.iter_mut() {
+            mark_grid_elem(num, grid);
             if grid_has_line(grid) {
                 return Ok(compute_solution(num, grid));
             }
@@ -113,8 +113,8 @@ pub fn solve_p2(filename: &str) -> Result<u32> {
 
     for num in nums {
         let mut completed_grid_positions = vec![];
-        for (i, mut grid) in grids.iter_mut().enumerate() {
-            mark_grid_elem(num, &mut grid);
+        for (i, grid) in grids.iter_mut().enumerate() {
+            mark_grid_elem(num, grid);
             if grid_has_line(grid) {
                 completed_grid_positions.push(i);
             }
