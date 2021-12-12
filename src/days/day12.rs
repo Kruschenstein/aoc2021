@@ -1,5 +1,5 @@
 use super::util::read_file_lines;
-use std::collections::{HashMap, HashSet};
+use std::collections::HashMap;
 use std::io::Result;
 
 const START: &str = "start";
@@ -7,112 +7,78 @@ const END: &str = "end";
 
 pub fn solve_p1(filename: &str) -> Result<u32> {
     let graph = create_cave_graph(&read_file_lines(filename)?);
-    let mut paths = 0;
-    let mut not_ended_paths = vec![];
-
-    for node in &graph[START] {
-        not_ended_paths.push(Path {
-            path: HashSet::from([START.to_string(), node.name.to_string()]),
-            head: node.name.to_string(),
-            has_double: false,
-        });
-    }
-
-    while let Some(path) = not_ended_paths.pop() {
-        let last = &path.head;
-        for cave in &graph[last] {
-            if !cave.is_small || !path.path.contains(&cave.name) {
-                let mut new_path = path.path.clone();
-                new_path.insert(cave.name.to_string());
-
-                let new_path = Path {
-                    path: new_path,
-                    head: cave.name.to_string(),
-                    has_double: false,
-                };
-
-                if cave.is_end {
-                    paths += 1
-                } else {
-                    not_ended_paths.push(new_path);
-                }
-            }
-        }
-    }
-
-    Ok(paths)
+    Ok(counter_p1(&graph, &mut vec![], hash(START)))
 }
 
 fn is_small_cave(cave: &str) -> bool {
     cave.chars().any(char::is_lowercase)
 }
 
-struct Path {
-    path: HashSet<String>,
-    has_double: bool,
-    head: String,
-}
-
-impl Path {
-    fn append(cave: &Cave, path: &Path) -> Path {
-        let mut new_path = path.path.clone();
-        new_path.insert(cave.name.to_string());
-        Path {
-            path: new_path,
-            has_double: path.has_double || cave.is_small && path.path.contains(&cave.name),
-            head: cave.name.to_string(),
-        }
+fn counter_p1(grid: &HashMap<u32, Vec<Cave>>, path: &mut Vec<u32>, head: u32) -> u32 {
+    if head == hash(END) {
+        return 1;
     }
+    let mut res = 0;
+    for cave in &grid[&head] {
+        path.push(head);
+        let name = cave.name;
+
+        if !cave.is_small || !path.contains(&name) {
+            res += counter_p1(grid, path, name);
+        }
+        path.pop();
+    }
+
+    res
 }
 
 pub fn solve_p2(filename: &str) -> Result<u32> {
     let graph = create_cave_graph(&read_file_lines(filename)?);
-    let mut paths = 0;
-    let mut not_ended_paths = vec![];
-
-    for node in &graph[START] {
-        not_ended_paths.push(Path {
-            path: HashSet::from([START.to_string(), node.name.to_string()]),
-            head: node.name.to_string(),
-            has_double: false,
-        });
-    }
-
-    while let Some(path) = not_ended_paths.pop() {
-        let last = &path.head;
-        for cave in &graph[last] {
-            if !cave.is_small || !path.has_double || !path.path.contains(&cave.name) {
-                let new_path = Path::append(cave, &path);
-                if cave.is_end {
-                    paths += 1
-                } else {
-                    not_ended_paths.push(new_path);
-                }
-            }
-        }
-    }
-
-    Ok(paths)
+    Ok(counter_p2(&graph, &mut vec![], &Cave::new(START), false))
 }
 
-#[derive(PartialEq, Eq, Hash)]
+fn counter_p2(
+    grid: &HashMap<u32, Vec<Cave>>,
+    path: &mut Vec<u32>,
+    head: &Cave,
+    has_double: bool,
+) -> u32 {
+    if head.is_end {
+        return 1;
+    }
+    let mut res = 0;
+    for cave in &grid[&head.name] {
+        path.push(head.name);
+        let name = cave.name;
+
+        if cave.is_small && (!has_double || !path.contains(&name)) {
+            res += counter_p2(grid, path, cave, has_double || path.contains(&name));
+        } else if !cave.is_small {
+            res += counter_p2(grid, path, cave, has_double);
+        }
+        path.pop();
+    }
+
+    res
+}
+
 struct Cave {
-    name: String,
+    name: u32,
     is_small: bool,
     is_end: bool,
 }
 
 impl Cave {
-    fn new(name: String) -> Cave {
+    fn new(name: &str) -> Cave {
         Cave {
-            is_small: is_small_cave(&name),
+            is_small: is_small_cave(name),
             is_end: name == END,
-            name,
+            name: hash(name),
         }
     }
 }
 
-fn create_cave_graph(lines: &[String]) -> HashMap<String, Vec<Cave>> {
+fn create_cave_graph(lines: &[String]) -> HashMap<u32, Vec<Cave>> {
     let mut graph = HashMap::with_capacity(lines.len());
 
     for line in lines {
@@ -121,16 +87,20 @@ fn create_cave_graph(lines: &[String]) -> HashMap<String, Vec<Cave>> {
         let left = split[1].to_string();
         if left != START {
             graph
-                .entry(right.clone())
+                .entry(hash(&right))
                 .or_insert_with(Vec::new)
-                .push(Cave::new(left.clone()));
+                .push(Cave::new(&left));
         }
         if right != START {
             graph
-                .entry(left)
+                .entry(hash(&left))
                 .or_insert_with(Vec::new)
-                .push(Cave::new(right));
+                .push(Cave::new(&right));
         }
     }
     graph
+}
+
+fn hash(name: &str) -> u32 {
+    name.chars().zip([2, 3]).map(|(c, p)| p * c as u32).sum()
 }
